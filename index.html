@@ -69,6 +69,17 @@
     .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,172,254,0.4); }
     .btn-secondary { background: rgba(255,255,255,0.1); box-shadow: none; }
     .btn-secondary:hover { background: rgba(255,255,255,0.2); box-shadow: none; }
+    .ml-toggle-wrap { position: fixed; top: 24px; right: 24px; z-index: 1000; }
+    .ml-toggle-btn { background: rgba(79,172,254,0.15); border: 1px solid rgba(79,172,254,0.4); color: #4facfe; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.88em; font-weight: 600; backdrop-filter: blur(10px); transition: all 0.2s; }
+    .ml-toggle-btn:hover { background: rgba(79,172,254,0.25); border-color: #4facfe; }
+    .maturity-legend { display: none; position: absolute; top: calc(100% + 8px); right: 0; background: rgba(22,33,62,0.97); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 16px 18px; width: 280px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+    .maturity-legend.open { display: block; }
+    .maturity-legend h4 { font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.08em; color: #888; margin-bottom: 12px; }
+    .ml-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .ml-row:last-child { margin-bottom: 0; }
+    .ml-badge { font-size: 0.75em; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; min-width: 76px; text-align: center; }
+    .ml-info { font-size: 0.78em; color: #aaa; line-height: 1.4; }
+    .ml-range { font-size: 0.72em; color: #666; margin-top: 2px; }
 
     /* ── PRINT STYLES ─────────────────────────────────────── */
     #printReport { display: none; }
@@ -178,6 +189,18 @@
 
 <!-- Hidden print-only report, built dynamically -->
 <div id="printReport"></div>
+
+<div class="ml-toggle-wrap">
+  <button class="ml-toggle-btn" onclick="this.nextElementSibling.classList.toggle('open')">Maturity Levels ▾</button>
+  <div class="maturity-legend">
+    <h4>Maturity Levels</h4>
+    <div class="ml-row"><span class="ml-badge level-1">Initial</span><div class="ml-info">Ad hoc, unstructured, no formal practices<div class="ml-range">Score: 1.0 – 1.5</div></div></div>
+    <div class="ml-row"><span class="ml-badge level-2">Developing</span><div class="ml-info">Some practices exist but inconsistently applied<div class="ml-range">Score: 1.5 – 2.5</div></div></div>
+    <div class="ml-row"><span class="ml-badge level-3">Defined</span><div class="ml-info">Processes documented and consistently followed<div class="ml-range">Score: 2.5 – 3.5</div></div></div>
+    <div class="ml-row"><span class="ml-badge level-4">Managed</span><div class="ml-info">Measured, monitored and actively improved<div class="ml-range">Score: 3.5 – 4.5</div></div></div>
+    <div class="ml-row"><span class="ml-badge level-5">Optimized</span><div class="ml-info">Continuously optimized, industry-leading practices<div class="ml-range">Score: 4.5 – 5.0</div></div></div>
+  </div>
+</div>
 
 <script>
   const THEMES = {
@@ -472,7 +495,6 @@
     btn.textContent = 'Preparing report…';
     btn.disabled = true;
 
-    try {
     // Build offscreen charts as images
     const mainImg       = await chartToImage(mainChart);
     const themeImgs     = await buildAllThemeImages();
@@ -551,40 +573,33 @@
     btn.disabled = false;
 
     window.print();
-    } catch (err) {
-      btn.textContent = 'Print / Save PDF';
-      btn.disabled = false;
-      alert('Could not prepare report: ' + err.message);
-    }
   }
 
   async function chartToImage(chart) {
-    return new Promise((resolve, reject) => {
-      try {
-        const offCanvas = document.createElement('canvas');
-        offCanvas.width  = 700;
-        offCanvas.height = 600;
-        const cfg = {
-          type: 'radar',
-          data: {
-            labels: chart.data.labels,
-            datasets: chart.data.datasets.map(ds => ({
-              data: ds.data,
-              backgroundColor: 'rgba(26,111,181,0.15)',
-              borderColor: '#1a6fb5',
-              borderWidth: 2,
-              pointBackgroundColor: '#1a6fb5'
-            }))
-          },
-          options: {
-            animation: false, responsive: false,
-            scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: '#444' }, grid: { color: 'rgba(0,0,0,0.1)' }, pointLabels: { color: '#111', font: { size: 13 } } } },
-            plugins: { legend: { display: false } }
-          }
-        };
-        const tmpChart = new Chart(offCanvas, cfg);
-        setTimeout(() => { resolve(offCanvas.toDataURL('image/png')); tmpChart.destroy(); }, 200);
-      } catch (err) { reject(err); }
+    // Render to a fresh offscreen canvas at higher resolution for crisp print output
+    return new Promise(resolve => {
+      const offCanvas = document.createElement('canvas');
+      offCanvas.width  = 700;
+      offCanvas.height = 600;
+      const cfg = JSON.parse(JSON.stringify(chart.config));
+      // Adjust colors for white background
+      cfg.options = cfg.options || {};
+      cfg.options.animation = false;
+      cfg.options.responsive = false;
+      cfg.options.scales = cfg.options.scales || {};
+      cfg.options.scales.r = cfg.options.scales.r || {};
+      cfg.options.scales.r.ticks = { ...(cfg.options.scales.r.ticks||{}), color: '#444' };
+      cfg.options.scales.r.grid  = { color: 'rgba(0,0,0,0.1)' };
+      cfg.options.scales.r.pointLabels = { ...(cfg.options.scales.r.pointLabels||{}), color: '#111', font: { size: 13 } };
+      // Darken dataset colors for white bg
+      cfg.data.datasets = cfg.data.datasets.map(ds => ({
+        ...ds,
+        backgroundColor: 'rgba(26,111,181,0.15)',
+        borderColor: '#1a6fb5',
+        pointBackgroundColor: '#1a6fb5'
+      }));
+      const tmpChart = new Chart(offCanvas, cfg);
+      setTimeout(() => { resolve(offCanvas.toDataURL('image/png')); tmpChart.destroy(); }, 200);
     });
   }
 
