@@ -69,20 +69,28 @@
     .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,172,254,0.4); }
     .btn-secondary { background: rgba(255,255,255,0.1); box-shadow: none; }
     .btn-secondary:hover { background: rgba(255,255,255,0.2); box-shadow: none; }
+
+    /* ── PRINT STYLES ─────────────────────────────────────── */
     #printReport { display: none; }
+
     @media print {
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
       body { background: #fff !important; color: #111 !important; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
       .upload-section, .results, .container > .header { display: none !important; }
       #printReport { display: block !important; }
+
       .pr-page { page-break-after: always; padding: 32px 40px; }
       .pr-page:last-child { page-break-after: avoid; }
+
       .pr-cover-header { border-bottom: 3px solid #4facfe; padding-bottom: 16px; margin-bottom: 28px; display: flex; justify-content: space-between; align-items: flex-end; }
       .pr-cover-header h1 { font-size: 1.8em; color: #1a1a2e; margin: 0; }
       .pr-cover-header .pr-meta { font-size: 0.85em; color: #666; text-align: right; line-height: 1.8; }
+
       .pr-section-title { font-size: 1.1em; font-weight: 700; color: #4facfe; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+
       .pr-chart-wrap { width: 420px; margin: 0 auto 28px; }
       .pr-chart-wrap img { width: 100%; height: auto; }
+
       .pr-table { width: 100%; border-collapse: collapse; margin-bottom: 28px; font-size: 0.92em; }
       .pr-table th { background: #1a1a2e; color: #fff; padding: 10px 14px; text-align: left; }
       .pr-table td { padding: 10px 14px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; }
@@ -93,17 +101,21 @@
       .pr-l3 { background: #fefce8; color: #b7950b; }
       .pr-l4 { background: #eafaf1; color: #1e8449; }
       .pr-l5 { background: #eaf4fe; color: #1a6fb5; }
+
       .pr-theme-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4facfe; padding-bottom: 10px; margin-bottom: 20px; }
       .pr-theme-header h2 { font-size: 1.4em; color: #1a1a2e; margin: 0; }
       .pr-theme-score { font-size: 1.1em; font-weight: 700; color: #4facfe; }
+
       .pr-questions { margin-bottom: 20px; }
       .pr-q-row { display: flex; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.88em; }
       .pr-q-label { font-weight: 700; color: #4facfe; min-width: 28px; }
       .pr-q-text { flex: 1; color: #333; }
       .pr-q-score { font-weight: 700; color: #1a1a2e; min-width: 36px; text-align: right; }
+
       .pr-comments-title { font-size: 0.95em; font-weight: 700; color: #333; margin-bottom: 8px; }
       .pr-comment { border-left: 3px solid #4facfe; padding: 8px 12px; margin-bottom: 8px; font-size: 0.85em; color: #444; background: #f7f9fc; }
       .pr-no-comments { font-size: 0.85em; color: #999; font-style: italic; }
+
       .pr-footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid #e0e0e0; font-size: 0.78em; color: #aaa; display: flex; justify-content: space-between; }
     }
   </style>
@@ -114,14 +126,16 @@
     <h1>ACMA Architecture Maturity Assessment</h1>
     <p class="meta"></p>
   </div>
+
   <div class="upload-section">
     <h2>Upload Survey Responses</h2>
     <div class="upload-area" id="uploadArea">
       <input type="file" id="fileInput" accept=".csv,.xlsx,.xls">
-      <div class="upload-text">Click to upload or drag &amp; drop</div>
+      <div class="upload-text">Click to upload or drag & drop</div>
       <div class="upload-formats">Supports: CSV, Excel (.xlsx, .xls)</div>
     </div>
   </div>
+
   <div class="results" id="results">
     <div class="grid">
       <div class="card">
@@ -152,7 +166,7 @@
       </div>
     </div>
     <div class="card qualitative">
-      <h2>Comments &amp; Remarks</h2>
+      <h2>Comments & Remarks</h2>
       <div id="qualitativeContainer"></div>
     </div>
     <div class="action-buttons">
@@ -161,7 +175,10 @@
     </div>
   </div>
 </div>
+
+<!-- Hidden print-only report, built dynamically -->
 <div id="printReport"></div>
+
 <script>
   const THEMES = {
     "Strategy & Alignment":    { questions: ["Q1","Q2","Q3","Q4","Q5"],      textField: "Q6_text" },
@@ -172,6 +189,7 @@
     "Value & Measurement":     { questions: ["Q31","Q32","Q33","Q34","Q35"], textField: "Q36_text" },
     "Solution Architecture":   { questions: ["Q37","Q38","Q39","Q40","Q41"], textField: "Q42_text" }
   };
+
   const QUESTION_LABELS = {
     "Strategy & Alignment": [
       "To what extent is architecture considered in strategic business planning?",
@@ -223,6 +241,7 @@
       "Are solution architectures evaluated post-implementation for effectiveness and lessons learned?"
     ]
   };
+
   const LEVELS = [
     { max: 1.5, name: "Initial",    cls: "level-1", prCls: "pr-l1" },
     { max: 2.5, name: "Developing", cls: "level-2", prCls: "pr-l2" },
@@ -230,12 +249,15 @@
     { max: 4.5, name: "Managed",    cls: "level-4", prCls: "pr-l4" },
     { max: 5.1, name: "Optimized",  cls: "level-5", prCls: "pr-l5" }
   ];
+
   let mainChart, comparisonChart;
   let themeNames = [], currentScores = [], refinedScores = [];
   let questionScores = {}, themeCharts = [];
   let storedQualData = {}, storedMeta = {};
+
   const uploadArea = document.getElementById('uploadArea');
   const fileInput  = document.getElementById('fileInput');
+
   uploadArea.addEventListener('click', () => fileInput.click());
   uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
   uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
@@ -245,6 +267,7 @@
     if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
   });
   fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
   function handleFile(file) {
     let companyName = '';
     const bracketMatch = file.name.match(/\[([^\]]+)\]/);
@@ -265,18 +288,22 @@
     };
     reader.readAsArrayBuffer(file);
   }
+
   function processData(rows, companyName) {
     const cols = Object.keys(rows[0]);
     const isMSForms = cols.some(c => c.includes('Theme') && c.includes('statement aligns best'));
     isMSForms ? processFormsData(rows, cols, companyName) : processSimpleData(rows, companyName);
   }
+
   function getLevel(score) {
     return LEVELS.find(l => score < l.max) || LEVELS[LEVELS.length - 1];
   }
+
   function avg(nums) {
     const valid = nums.filter(n => n >= 1 && n <= 5);
     return valid.length ? Math.round(valid.reduce((a, b) => a + b, 0) / valid.length * 10) / 10 : 0;
   }
+
   function processFormsData(rows, cols, companyName) {
     const themePatterns = [
       { name: "Strategy & Alignment",    pattern: /Theme\s*1/i, remarkPattern: /remarks.*Strategy/i },
@@ -309,6 +336,7 @@
     }
     renderResults(themeScores, qualData, rows.length, companyName);
   }
+
   function processSimpleData(rows, companyName) {
     const themeScores = {}, qualData = {};
     for (const [name, cfg] of Object.entries(THEMES)) {
@@ -325,43 +353,53 @@
     }
     renderResults(themeScores, qualData, rows.length, companyName);
   }
+
   function renderResults(themeScores, qualData, responseCount, companyName) {
     themeNames    = Object.keys(themeScores);
     currentScores = Object.values(themeScores);
     refinedScores = [...currentScores];
     storedQualData = qualData;
     storedMeta = { companyName, responseCount, date: new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) };
+
     document.querySelector('.header h1').textContent =
-      companyName ? companyName + ' \u2013 ACMA Maturity Report' : 'ACMA Architecture Maturity Assessment';
+      companyName ? `${companyName} \u2013 ACMA Maturity Report` : 'ACMA Architecture Maturity Assessment';
     document.querySelector('.meta').innerHTML =
-      (companyName ? '<div class="company-name">' + companyName + '</div>' : '') +
-      '<span>Generated: ' + storedMeta.date + '</span>' +
-      '<span>Respondents: ' + responseCount + '</span>';
+      `${companyName ? `<div class="company-name">${companyName}</div>` : ''}
+       <span>Generated: ${storedMeta.date}</span>
+       <span>Respondents: ${responseCount}</span>`;
+
     document.getElementById('scoreTableBody').innerHTML = themeNames.map((name, i) => {
       const { name: lvlName, cls } = getLevel(currentScores[i]);
-      return '<tr class="theme-row" onclick="toggleThemeDetails(' + i + ')">' +
-        '<td>' + name + '</td><td><strong>' + currentScores[i].toFixed(1) + '</strong></td>' +
-        '<td><span class="score-badge ' + cls + '">' + lvlName + '</span></td></tr>' +
-        '<tr class="theme-details" id="themeDetails' + i + '">' +
-        '<td colspan="3"><div class="mini-chart-container"><canvas id="themeChart' + i + '"></canvas></div></td></tr>';
+      return `<tr class="theme-row" onclick="toggleThemeDetails(${i})">
+        <td>${name}</td><td><strong>${currentScores[i].toFixed(1)}</strong></td>
+        <td><span class="score-badge ${cls}">${lvlName}</span></td>
+      </tr>
+      <tr class="theme-details" id="themeDetails${i}">
+        <td colspan="3"><div class="mini-chart-container"><canvas id="themeChart${i}"></canvas></div></td>
+      </tr>`;
     }).join('');
+
     document.getElementById('slidersContainer').innerHTML = themeNames.map((name, i) =>
-      '<div class="slider-group">' +
-      '<label><span>' + name + '</span><span id="val' + i + '">' + currentScores[i].toFixed(1) + '</span></label>' +
-      '<input type="range" min="1" max="5" step="0.1" value="' + currentScores[i] + '" onchange="updateRefined(' + i + ', this.value)"></div>'
+      `<div class="slider-group">
+        <label><span>${name}</span><span id="val${i}">${currentScores[i].toFixed(1)}</span></label>
+        <input type="range" min="1" max="5" step="0.1" value="${currentScores[i]}" onchange="updateRefined(${i}, this.value)">
+      </div>`
     ).join('');
+
     document.getElementById('qualitativeContainer').innerHTML = themeNames.map(name => {
       const comments = qualData[name] || [];
-      const label = comments.length ? name + ' (' + comments.length + ' comment' + (comments.length > 1 ? 's' : '') + ')' : name + ' (No comments)';
+      const label = comments.length ? `${name} (${comments.length} comment${comments.length > 1 ? 's' : ''})` : `${name} (No comments)`;
       const body = comments.length
-        ? comments.map(c => '<div class="comment">' + c + '</div>').join('')
-        : '<p style="color:#888;font-style:italic;">No comments provided for this theme.</p>';
-      return '<div class="qualitative-section"><h3 onclick="this.parentElement.classList.toggle(\'open\')">' + label + '</h3><div class="comments">' + body + '</div></div>';
+        ? comments.map(c => `<div class="comment">${c}</div>`).join('')
+        : `<p style="color:#888;font-style:italic;">No comments provided for this theme.</p>`;
+      return `<div class="qualitative-section"><h3 onclick="this.parentElement.classList.toggle('open')">${label}</h3><div class="comments">${body}</div></div>`;
     }).join('');
+
     createCharts();
     document.getElementById('results').classList.add('visible');
     document.querySelector('.upload-section').style.display = 'none';
   }
+
   function radarConfig(labels, datasets, questionTexts) {
     return {
       type: 'radar',
@@ -376,7 +414,7 @@
               title: ctx => {
                 const i = ctx[0].dataIndex;
                 const words = questionTexts[i].split(' ');
-                const lines = []; let line = 'Q' + (i + 1) + ': ';
+                const lines = []; let line = `Q${i + 1}: `;
                 for (const word of words) {
                   if ((line + word).length > 40) { lines.push(line.trim()); line = ''; }
                   line += word + ' ';
@@ -384,13 +422,14 @@
                 if (line.trim()) lines.push(line.trim());
                 return lines;
               },
-              label: ctx => 'Score: ' + ctx.raw.toFixed(1)
+              label: ctx => `Score: ${ctx.raw.toFixed(1)}`
             }
           } : {}
         }
       }
     };
   }
+
   function createCharts() {
     if (mainChart) mainChart.destroy();
     if (comparisonChart) comparisonChart.destroy();
@@ -402,86 +441,127 @@
       { data: [...refinedScores], backgroundColor: 'rgba(0,242,254,0.2)',  borderColor: '#00f2fe', borderWidth: 2, pointBackgroundColor: '#00f2fe' }
     ]));
   }
+
   function updateRefined(i, val) {
     refinedScores[i] = parseFloat(val);
     document.getElementById('val' + i).textContent = parseFloat(val).toFixed(1);
     comparisonChart.data.datasets[1].data = [...refinedScores];
     comparisonChart.update();
   }
+
   function toggleThemeDetails(i) {
     const row = document.querySelectorAll('.theme-row')[i];
     row.classList.toggle('open');
     if (row.classList.contains('open') && !themeCharts[i]) createThemeChart(i);
   }
+
   function createThemeChart(i) {
     const scores = questionScores[themeNames[i]] || [];
     if (!scores.length) return;
     const qTexts = QUESTION_LABELS[themeNames[i]] || null;
     themeCharts[i] = new Chart(document.getElementById('themeChart' + i), radarConfig(
-      scores.map((_, qi) => 'Q' + (qi + 1)),
+      scores.map((_, qi) => `Q${qi + 1}`),
       [{ data: scores, backgroundColor: 'rgba(79,172,254,0.2)', borderColor: '#4facfe', borderWidth: 2, pointBackgroundColor: '#4facfe' }],
       qTexts
     ));
   }
+
+  // ── PRINT REPORT ────────────────────────────────────────────
   function printReport() {
     const btn = document.querySelector('.btn');
-    btn.textContent = 'Preparing report...';
+    btn.textContent = 'Preparing report…';
     btn.disabled = true;
+
     try {
-      const mainImg   = chartToImage(mainChart);
-      const themeImgs = buildAllThemeImages();
-      const { companyName, responseCount, date } = storedMeta;
-      const title = companyName ? companyName + ' \u2013 ACMA Maturity Report' : 'ACMA Architecture Maturity Assessment';
-      let html = '<div class="pr-page"><div class="pr-cover-header"><h1>' + title + '</h1>' +
-        '<div class="pr-meta">' + (companyName ? '<div>' + companyName + '</div>' : '') +
-        '<div>Generated: ' + date + '</div><div>Respondents: ' + responseCount + '</div></div></div>' +
-        '<div class="pr-section-title">Overall Maturity Profile</div>' +
-        '<div class="pr-chart-wrap"><img src="' + mainImg + '"></div>' +
-        '<div class="pr-section-title">Theme Scores</div>' +
-        '<table class="pr-table"><thead><tr><th>Theme</th><th>Score</th><th>Maturity Level</th></tr></thead><tbody>' +
-        themeNames.map((name, i) => {
-          const { name: lvlName, prCls } = getLevel(currentScores[i]);
-          return '<tr><td>' + name + '</td><td><strong>' + currentScores[i].toFixed(1) + ' / 5.0</strong></td>' +
-            '<td><span class="pr-badge ' + prCls + '">' + lvlName + '</span></td></tr>';
-        }).join('') +
-        '</tbody></table><div class="pr-footer"><span>' + title + '</span><span>' + date + '</span></div></div>';
-      themeNames.forEach((name, i) => {
-        const { name: lvlName, prCls } = getLevel(currentScores[i]);
-        const qLabels  = QUESTION_LABELS[name] || [];
-        const qScores  = questionScores[name]  || [];
-        const comments = storedQualData[name]  || [];
-        const qRows = qLabels.map((q, qi) =>
-          '<div class="pr-q-row"><span class="pr-q-label">Q' + (qi+1) + '</span>' +
-          '<span class="pr-q-text">' + q + '</span>' +
-          '<span class="pr-q-score">' + (qScores[qi] || 0).toFixed(1) + '</span></div>'
-        ).join('');
-        const commentBlock = comments.length
-          ? comments.map(c => '<div class="pr-comment">' + c + '</div>').join('')
-          : '<div class="pr-no-comments">No comments provided for this theme.</div>';
-        html += '<div class="pr-page"><div class="pr-theme-header"><h2>' + name + '</h2>' +
-          '<div><span class="pr-theme-score">' + currentScores[i].toFixed(1) + ' / 5.0</span>' +
-          '&nbsp;<span class="pr-badge ' + prCls + '">' + lvlName + '</span></div></div>' +
-          '<div class="pr-chart-wrap"><img src="' + themeImgs[i] + '"></div>' +
-          '<div class="pr-section-title" style="margin-bottom:10px;">Question Breakdown</div>' +
-          '<div class="pr-questions">' + qRows + '</div>' +
-          '<div class="pr-comments-title">Comments &amp; Remarks</div>' + commentBlock +
-          '<div class="pr-footer"><span>' + title + ' \u2013 ' + name + '</span><span>' + date + '</span></div></div>';
-      });
-      document.getElementById('printReport').innerHTML = html;
-      btn.textContent = 'Print / Save PDF';
-      btn.disabled = false;
-      window.print();
+    const mainImg   = chartToImage(mainChart);
+    const themeImgs = buildAllThemeImages();
+
+    const { companyName, responseCount, date } = storedMeta;
+    const title = companyName ? `${companyName} \u2013 ACMA Maturity Report` : 'ACMA Architecture Maturity Assessment';
+
+    // Cover page
+    let html = `<div class="pr-page">
+      <div class="pr-cover-header">
+        <h1>${title}</h1>
+        <div class="pr-meta">
+          ${companyName ? `<div>${companyName}</div>` : ''}
+          <div>Generated: ${date}</div>
+          <div>Respondents: ${responseCount}</div>
+        </div>
+      </div>
+      <div class="pr-section-title">Overall Maturity Profile</div>
+      <div class="pr-chart-wrap"><img src="${mainImg}"></div>
+      <div class="pr-section-title">Theme Scores</div>
+      <table class="pr-table">
+        <thead><tr><th>Theme</th><th>Score</th><th>Maturity Level</th></tr></thead>
+        <tbody>
+          ${themeNames.map((name, i) => {
+            const { name: lvlName, prCls } = getLevel(currentScores[i]);
+            return `<tr>
+              <td>${name}</td>
+              <td><strong>${currentScores[i].toFixed(1)} / 5.0</strong></td>
+              <td><span class="pr-badge ${prCls}">${lvlName}</span></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+      <div class="pr-footer"><span>${title}</span><span>${date}</span></div>
+    </div>`;
+
+    // One page per theme
+    themeNames.forEach((name, i) => {
+      const { name: lvlName, prCls } = getLevel(currentScores[i]);
+      const qLabels  = QUESTION_LABELS[name] || [];
+      const qScores  = questionScores[name]  || [];
+      const comments = storedQualData[name]  || [];
+
+      const qRows = qLabels.map((q, qi) =>
+        `<div class="pr-q-row">
+          <span class="pr-q-label">Q${qi+1}</span>
+          <span class="pr-q-text">${q}</span>
+          <span class="pr-q-score">${(qScores[qi] || 0).toFixed(1)}</span>
+        </div>`
+      ).join('');
+
+      const commentBlock = comments.length
+        ? comments.map(c => `<div class="pr-comment">${c}</div>`).join('')
+        : `<div class="pr-no-comments">No comments provided for this theme.</div>`;
+
+      html += `<div class="pr-page">
+        <div class="pr-theme-header">
+          <h2>${name}</h2>
+          <div>
+            <span class="pr-theme-score">${currentScores[i].toFixed(1)} / 5.0</span>
+            &nbsp;<span class="pr-badge ${prCls}">${lvlName}</span>
+          </div>
+        </div>
+        <div class="pr-chart-wrap"><img src="${themeImgs[i]}"></div>
+        <div class="pr-section-title" style="margin-bottom:10px;">Question Breakdown</div>
+        <div class="pr-questions">${qRows}</div>
+        <div class="pr-comments-title">Comments & Remarks</div>
+        ${commentBlock}
+        <div class="pr-footer"><span>${title} \u2013 ${name}</span><span>${date}</span></div>
+      </div>`;
+    });
+
+    document.getElementById('printReport').innerHTML = html;
+
+    btn.textContent = 'Print / Save PDF';
+    btn.disabled = false;
+
+    window.print();
     } catch (err) {
       btn.textContent = 'Print / Save PDF';
       btn.disabled = false;
       alert('Could not prepare report: ' + err.message);
     }
   }
+
   function chartToImage(chart) {
     const offCanvas = document.createElement('canvas');
     offCanvas.width  = 700;
     offCanvas.height = 600;
-    const tmpChart = new Chart(offCanvas, {
+    const cfg = {
       type: 'radar',
       data: {
         labels: chart.data.labels,
@@ -498,21 +578,24 @@
         scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: '#444' }, grid: { color: 'rgba(0,0,0,0.1)' }, pointLabels: { color: '#111', font: { size: 13 } } } },
         plugins: { legend: { display: false } }
       }
-    });
+    };
+    const tmpChart = new Chart(offCanvas, cfg);
     const img = offCanvas.toDataURL('image/png');
     tmpChart.destroy();
     return img;
   }
+
   function buildAllThemeImages() {
     return themeNames.map(name => {
       const scores = questionScores[name] || [];
+      const labels = scores.map((_, qi) => `Q${qi+1}`);
       const offCanvas = document.createElement('canvas');
       offCanvas.width  = 700;
       offCanvas.height = 600;
-      const tmpChart = new Chart(offCanvas, {
+      const cfg = {
         type: 'radar',
         data: {
-          labels: scores.map((_, qi) => 'Q' + (qi+1)),
+          labels,
           datasets: [{ data: scores, backgroundColor: 'rgba(26,111,181,0.15)', borderColor: '#1a6fb5', borderWidth: 2, pointBackgroundColor: '#1a6fb5' }]
         },
         options: {
@@ -520,12 +603,14 @@
           scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: '#444' }, grid: { color: 'rgba(0,0,0,0.1)' }, pointLabels: { color: '#111', font: { size: 14 } } } },
           plugins: { legend: { display: false } }
         }
-      });
+      };
+      const tmpChart = new Chart(offCanvas, cfg);
       const img = offCanvas.toDataURL('image/png');
       tmpChart.destroy();
       return img;
     });
   }
+
   function resetUpload() {
     document.getElementById('results').classList.remove('visible');
     document.querySelector('.upload-section').style.display = 'block';
