@@ -70,7 +70,7 @@
     .btn-secondary { background: rgba(255,255,255,0.1); box-shadow: none; }
     .btn-secondary:hover { background: rgba(255,255,255,0.2); box-shadow: none; }
 
-    /* ── PRINT STYLES ─────────────────────────────────────── */
+    /* -- PRINT STYLES ---------------------------------------- */
     #printReport { display: none; }
 
     @media print {
@@ -466,10 +466,10 @@
     ));
   }
 
-  // ── PRINT REPORT ────────────────────────────────────────────
+  // -- PRINT REPORT ------------------------------------------
   function printReport() {
     const btn = document.querySelector('.btn');
-    btn.textContent = 'Preparing report…';
+    btn.textContent = 'Preparing report...';
     btn.disabled = true;
 
     try {
