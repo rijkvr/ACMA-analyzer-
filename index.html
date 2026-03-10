@@ -10,7 +10,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #e4e4e4; padding: 20px; }
     .container { max-width: 1200px; margin: 0 auto; }
-    .header { text-align: center; padding: 30px 0; margin-bottom: 30px; background: rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+    .header { text-align: center; padding: 30px 0; margin-bottom: 30px; background: rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); position: relative; }
     .header h1 { font-size: 2.2em; background: linear-gradient(90deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; }
     .meta { color: #888; font-size: 0.95em; }
     .meta span { margin: 0 15px; }
@@ -70,6 +70,17 @@
     .btn-secondary { background: rgba(255,255,255,0.1); box-shadow: none; }
     .btn-secondary:hover { background: rgba(255,255,255,0.2); box-shadow: none; }
 
+    /* -- HAMBURGER MENU -------------------------------------- */
+    .hamburger-btn { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(79,172,254,0.3); border-radius: 8px; width: 42px; height: 42px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: background 0.2s; }
+    .hamburger-btn:hover { background: rgba(79,172,254,0.2); }
+    .hamburger-btn span { display: block; width: 20px; height: 2px; background: #4facfe; border-radius: 2px; }
+    .maturity-legend { display: none; position: absolute; top: 66px; right: 16px; background: #1c2340; border: 1px solid rgba(79,172,254,0.4); border-radius: 12px; padding: 18px 20px; z-index: 200; min-width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); text-align: left; }
+    .maturity-legend.open { display: block; }
+    .maturity-legend h3 { color: #4facfe; font-size: 0.95em; margin-bottom: 14px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .ml-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 0.87em; }
+    .ml-range { color: #888; min-width: 70px; font-size: 0.82em; }
+    .ml-desc { color: #ccc; }
+
     /* -- PRINT STYLES ---------------------------------------- */
     #printReport { display: none; }
 
@@ -125,6 +136,19 @@
   <div class="header">
     <h1>ACMA Architecture Maturity Assessment</h1>
     <p class="meta"></p>
+
+    <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMaturityLegend()">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="maturity-legend" id="maturityLegend">
+      <h3>Maturity Levels</h3>
+      <div class="ml-row"><span class="score-badge level-1">Initial</span><span class="ml-range">1.0 &ndash; 1.4</span><span class="ml-desc">Ad hoc, no formal processes in place</span></div>
+      <div class="ml-row"><span class="score-badge level-2">Developing</span><span class="ml-range">1.5 &ndash; 2.4</span><span class="ml-desc">Emerging practices, inconsistently applied</span></div>
+      <div class="ml-row"><span class="score-badge level-3">Defined</span><span class="ml-range">2.5 &ndash; 3.4</span><span class="ml-desc">Documented and applied across the organisation</span></div>
+      <div class="ml-row"><span class="score-badge level-4">Managed</span><span class="ml-range">3.5 &ndash; 4.4</span><span class="ml-desc">Measured, monitored and actively managed</span></div>
+      <div class="ml-row"><span class="score-badge level-5">Optimized</span><span class="ml-range">4.5 &ndash; 5.0</span><span class="ml-desc">Continuously improving, industry-leading</span></div>
+    </div>
   </div>
 
   <div class="upload-section">
@@ -610,6 +634,18 @@
       return img;
     });
   }
+
+  function toggleMaturityLegend() {
+    document.getElementById('maturityLegend').classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    var legend = document.getElementById('maturityLegend');
+    var btn    = document.getElementById('hamburgerBtn');
+    if (legend && legend.classList.contains('open') && !legend.contains(e.target) && !btn.contains(e.target)) {
+      legend.classList.remove('open');
+    }
+  });
 
   function resetUpload() {
     document.getElementById('results').classList.remove('visible');
