@@ -10,7 +10,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #e4e4e4; padding: 20px; }
     .container { max-width: 1200px; margin: 0 auto; }
-    .header { text-align: center; padding: 30px 0; margin-bottom: 30px; background: rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); position: relative; }
+    .header { text-align: center; padding: 30px 0; margin-bottom: 30px; background: rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); position: relative; z-index: 100; }
     .header h1 { font-size: 2.2em; background: linear-gradient(90deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; }
     .meta { color: #888; font-size: 0.95em; }
     .meta span { margin: 0 15px; }
@@ -74,7 +74,7 @@
     .hamburger-btn { position: absolute; top: 16px; right: 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(79,172,254,0.3); border-radius: 8px; width: 42px; height: 42px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: background 0.2s; }
     .hamburger-btn:hover { background: rgba(79,172,254,0.2); }
     .hamburger-btn span { display: block; width: 20px; height: 2px; background: #4facfe; border-radius: 2px; }
-    .maturity-legend { display: none; position: absolute; top: 66px; right: 16px; background: #1c2340; border: 1px solid rgba(79,172,254,0.4); border-radius: 12px; padding: 18px 20px; z-index: 200; min-width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); text-align: left; }
+    .maturity-legend { display: none; position: fixed; background: #1c2340; border: 1px solid rgba(79,172,254,0.4); border-radius: 12px; padding: 18px 20px; z-index: 9999; min-width: 320px; box-shadow: 0 8px 32px rgba(0,0,0,0.6); text-align: left; }
     .maturity-legend.open { display: block; }
     .maturity-legend h3 { color: #4facfe; font-size: 0.95em; margin-bottom: 14px; letter-spacing: 0.04em; text-transform: uppercase; }
     .ml-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 0.87em; }
@@ -636,7 +636,16 @@
   }
 
   function toggleMaturityLegend() {
-    document.getElementById('maturityLegend').classList.toggle('open');
+    var legend = document.getElementById('maturityLegend');
+    var btn    = document.getElementById('hamburgerBtn');
+    if (legend.classList.contains('open')) {
+      legend.classList.remove('open');
+    } else {
+      var rect = btn.getBoundingClientRect();
+      legend.style.top  = (rect.bottom + 8) + 'px';
+      legend.style.right = (window.innerWidth - rect.right) + 'px';
+      legend.classList.add('open');
+    }
   }
 
   document.addEventListener('click', function(e) {
