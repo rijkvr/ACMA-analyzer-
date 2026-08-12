@@ -386,6 +386,9 @@
       const altMatch = file.name.match(/Assessment\s+([A-Za-z0-9\s]+?)\s+\(/i);
       if (altMatch) companyName = altMatch[1].trim();
     }
+    /* Excel appends the sheet name when a workbook is saved as CSV, which would
+       otherwise show up in the report header as "... Delta(Sheet1)". */
+    companyName = companyName.replace(/\s*\((?:sheet|blad|tabel|table)\s*\d*\)\s*$/i, '').trim();
     const reader = new FileReader();
     reader.onload = e => {
       try {
@@ -398,9 +401,18 @@
     reader.readAsArrayBuffer(file);
   }
 
-  /* Matches the theme number in a Forms column header, in any language:
-     "Theme 1. Strategy and Alignment: ..." and "Thema 1. Strategie en afstemming: ..." */
-  const THEME_NUM = /\bthem[ae]\s*\.?\s*([1-7])\b/i;
+  /* Theme number of a Forms column header. Two shapes occur in real exports:
+       "Theme 1. Strategy and Alignment: ..."   — the word, English tenant
+       "1. Strategie en Afstemming: ..."        — bare number, Dutch tenant
+     The bare form must be anchored at the start and followed by punctuation;
+     without that anchor ordinary question text would match a stray digit. */
+  const THEME_WORD = /\bthem[ae]\s*\.?\s*([1-7])\b/i;
+  const THEME_LEAD = /^\s*([1-7])\s*[.:;)-]/;
+
+  function themeNumOf(col) {
+    const m = col.match(THEME_WORD) || col.match(THEME_LEAD);
+    return m ? parseInt(m[1]) : 0;
+  }
 
   /* Standard Microsoft Forms metadata columns, English and Dutch tenants. */
   const META_COL = /^(id|start time|completion time|email|name|last modified time|language|begintijd|tijd van voltooien|e-?mail|naam|taal|tijd van laatste wijziging)$/i;
@@ -420,7 +432,7 @@
 
   function processData(rows, companyName) {
     const cols = Object.keys(rows[0]);
-    const isMSForms = cols.some(c => THEME_NUM.test(c));
+    const isMSForms = cols.some(c => themeNumOf(c) > 0);
     isMSForms ? processFormsData(rows, cols, companyName) : processSimpleData(rows, companyName);
   }
 
@@ -435,7 +447,7 @@
 
   function processFormsData(rows, cols, companyName) {
     /* Theme number per column, in sheet order. 0 = not a themed question column. */
-    const themeOf = cols.map(c => { const m = c.match(THEME_NUM); return m ? parseInt(m[1]) : 0; });
+    const themeOf = cols.map(c => themeNumOf(c));
     const themeNamesInOrder = Object.keys(THEMES);
     const themeScores = {}, qualData = {};
 
