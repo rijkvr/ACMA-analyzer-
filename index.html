@@ -3,27 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Architecture Maturity Assessment</title>
+  <title>BlueDolphin Architecture Maturity Assessment</title>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #e4e4e4; padding: 20px; }
+    body { font-family: 'Be Vietnam Pro', Arial, sans-serif; background: linear-gradient(135deg, #04141E 0%, #0E6093 100%); min-height: 100vh; color: #e4e4e4; padding: 20px; }
     .container { max-width: 1200px; margin: 0 auto; }
 
     /* -- HEADER ---------------------------------------------- */
     .header { text-align: center; padding: 30px 0; margin-bottom: 30px; background: rgba(255,255,255,0.05); border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-    .header h1 { font-size: 2.2em; background: linear-gradient(90deg, #4facfe, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; }
+    .header-logo { margin-bottom: 18px; line-height: 0; }
+    .header-logo svg { height: 40px; width: auto; }
+    .header h1 { font-size: 1.6em; color: #e4e4e4; font-weight: 600; letter-spacing: 0.02em; margin-bottom: 10px; }
     .meta { color: #888; font-size: 0.95em; }
     .meta span { margin: 0 15px; }
     .company-name { font-size: 0.9em; color: #aaa; margin-bottom: 5px; }
 
     /* -- UPLOAD ---------------------------------------------- */
     .upload-section { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); margin-bottom: 30px; text-align: center; }
-    .upload-section h2 { color: #4facfe; margin-bottom: 20px; }
-    .upload-area { border: 2px dashed rgba(79,172,254,0.5); border-radius: 12px; padding: 40px; cursor: pointer; transition: all 0.3s; max-width: 460px; margin: 0 auto; }
-    .upload-area:hover { border-color: #4facfe; background: rgba(79,172,254,0.1); }
-    .upload-area.dragover { border-color: #00f2fe; background: rgba(0,242,254,0.1); }
+    .upload-section h2 { color: #32BEFC; margin-bottom: 20px; }
+    .upload-area { border: 2px dashed rgba(50,190,252,0.5); border-radius: 12px; padding: 40px; cursor: pointer; transition: all 0.3s; max-width: 460px; margin: 0 auto; }
+    .upload-area:hover { border-color: #32BEFC; background: rgba(50,190,252,0.1); }
+    .upload-area.dragover { border-color: #82F0F0; background: rgba(130,240,240,0.1); }
     .upload-area input { display: none; }
     .upload-text { color: #888; margin-bottom: 10px; }
     .upload-formats { font-size: 0.85em; color: #666; }
@@ -36,18 +39,18 @@
 
     /* -- CARDS ----------------------------------------------- */
     .card { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
-    .card h2 { font-size: 1.3em; margin-bottom: 20px; color: #4facfe; }
+    .card h2 { font-size: 1.3em; margin-bottom: 20px; color: #32BEFC; }
     .chart-container { position: relative; height: 350px; }
 
     /* -- SCORE TABLE ----------------------------------------- */
     .score-table { width: 100%; border-collapse: collapse; }
-    .score-table th { color: #4facfe; font-weight: 600; font-size: 0.9em; padding: 0 12px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    .score-table th { color: #32BEFC; font-weight: 600; font-size: 0.9em; padding: 0 12px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.2); }
     .score-table td { padding: 12px 12px; text-align: left; vertical-align: middle; font-size: 0.9em; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .theme-row { cursor: pointer; transition: background 0.2s; }
-    .theme-row:hover { background: rgba(79,172,254,0.15) !important; }
+    .theme-row:hover { background: rgba(50,190,252,0.15) !important; }
     .score-table tbody tr.theme-row:nth-child(odd) { background: rgba(255,255,255,0.03); }
     .theme-row td:first-child { display: flex; align-items: center; gap: 8px; }
-    .theme-row td:first-child::before { content: '\25B6'; font-size: 0.6em; transition: transform 0.25s; color: #4facfe; flex-shrink: 0; }
+    .theme-row td:first-child::before { content: '\25B6'; font-size: 0.6em; transition: transform 0.25s; color: #32BEFC; flex-shrink: 0; }
     .theme-row.open td:first-child::before { transform: rotate(90deg); }
     .theme-details { display: none; }
     .theme-row.open + .theme-details { display: table-row; }
@@ -60,27 +63,27 @@
     .level-2 { background: #ffa50033; color: #ffa500; }
     .level-3 { background: #ffd93d33; color: #ffd93d; }
     .level-4 { background: #6bcb7733; color: #6bcb77; }
-    .level-5 { background: #4facfe33; color: #4facfe; }
+    .level-5 { background: #32BEFC33; color: #32BEFC; }
 
     /* -- SLIDERS --------------------------------------------- */
     .slider-group { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.07); }
     .slider-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     .slider-group label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 0.9em; }
-    .slider-val { font-weight: 700; color: #4facfe; }
+    .slider-val { font-weight: 700; color: #32BEFC; }
     .slider-group input[type="range"] { width: 100%; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); appearance: none; cursor: pointer; }
-    .slider-group input[type="range"]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #4facfe; cursor: pointer; }
+    .slider-group input[type="range"]::-webkit-slider-thumb { appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #32BEFC; cursor: pointer; }
 
     /* -- QUALITATIVE ----------------------------------------- */
     .qualitative { margin-top: 30px; }
     .qualitative-section { margin-bottom: 6px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); }
     .qualitative-section h3 { font-size: 1em; font-weight: 500; color: #aaa; padding: 13px 16px; cursor: pointer; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.04); transition: background 0.2s; margin: 0; }
-    .qualitative-section h3:hover { background: rgba(79,172,254,0.1); color: #e4e4e4; }
-    .qualitative-section h3::before { content: '\25B6'; font-size: 0.6em; transition: transform 0.25s; color: #4facfe; flex-shrink: 0; }
+    .qualitative-section h3:hover { background: rgba(50,190,252,0.1); color: #e4e4e4; }
+    .qualitative-section h3::before { content: '\25B6'; font-size: 0.6em; transition: transform 0.25s; color: #32BEFC; flex-shrink: 0; }
     .qualitative-section.open h3::before { transform: rotate(90deg); }
     .qualitative-section.open h3 { color: #e4e4e4; }
     .comments { display: none; padding: 14px 16px; background: rgba(255,255,255,0.02); }
     .qualitative-section.open .comments { display: block; }
-    .comment { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.9em; border-left: 3px solid #4facfe; line-height: 1.5; }
+    .comment { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.9em; border-left: 3px solid #32BEFC; line-height: 1.5; }
     .comment:last-child { margin-bottom: 0; }
 
     /* -- CHART LEGEND ---------------------------------------- */
@@ -90,18 +93,18 @@
 
     /* -- BUTTONS --------------------------------------------- */
     .action-buttons { display: flex; gap: 15px; justify-content: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.1); }
-    .btn { background: #4facfe; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1em; box-shadow: 0 4px 15px rgba(79,172,254,0.3); transition: all 0.3s; }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79,172,254,0.4); }
+    .btn { background: #32BEFC; color: #fff; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1em; box-shadow: 0 4px 15px rgba(50,190,252,0.3); transition: all 0.3s; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(50,190,252,0.4); }
     .btn-secondary { background: rgba(255,255,255,0.1); box-shadow: none; }
     .btn-secondary:hover { background: rgba(255,255,255,0.2); box-shadow: none; }
 
     /* -- HAMBURGER MENU -------------------------------------- */
-    .hamburger-btn { position: fixed; top: 20px; right: 20px; background: rgba(26,26,46,0.92); border: 1px solid rgba(79,172,254,0.35); border-radius: 10px; width: 42px; height: 42px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; z-index: 9999; backdrop-filter: blur(10px); }
-    .hamburger-btn:hover { border-color: #4facfe; background: rgba(79,172,254,0.15); }
-    .hamburger-btn span { display: block; width: 20px; height: 2px; background: #4facfe; border-radius: 2px; }
-    .maturity-legend { display: none; position: fixed; background: rgba(22,33,62,0.98); border: 1px solid rgba(79,172,254,0.3); border-radius: 14px; padding: 22px 24px; z-index: 9999; width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.7); backdrop-filter: blur(16px); }
+    .hamburger-btn { position: fixed; top: 20px; right: 20px; background: rgba(4,20,30,0.92); border: 1px solid rgba(50,190,252,0.35); border-radius: 10px; width: 42px; height: 42px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; cursor: pointer; transition: all 0.2s; z-index: 9999; backdrop-filter: blur(10px); }
+    .hamburger-btn:hover { border-color: #32BEFC; background: rgba(50,190,252,0.15); }
+    .hamburger-btn span { display: block; width: 20px; height: 2px; background: #32BEFC; border-radius: 2px; }
+    .maturity-legend { display: none; position: fixed; background: rgba(4,20,30,0.98); border: 1px solid rgba(50,190,252,0.3); border-radius: 14px; padding: 22px 24px; z-index: 9999; width: 420px; box-shadow: 0 20px 60px rgba(0,0,0,0.7); backdrop-filter: blur(16px); }
     .maturity-legend.open { display: block; }
-    .maturity-legend h3 { color: #4facfe; font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(79,172,254,0.2); }
+    .maturity-legend h3 { color: #32BEFC; font-size: 0.75em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(50,190,252,0.2); }
     .ml-grid { display: flex; flex-direction: column; }
     .ml-row { display: flex; align-items: center; gap: 16px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
     .ml-row:last-child { border-bottom: none; padding-bottom: 0; }
@@ -114,47 +117,77 @@
 
     @media print {
       * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      body { background: #fff !important; color: #111 !important; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+      body { background: #fff !important; color: #111 !important; padding: 0; font-family: 'Be Vietnam Pro', Arial, sans-serif; }
       .container, .hamburger-btn, .maturity-legend { display: none !important; }
       #printReport { display: block !important; }
 
       .pr-page { padding: 24px 36px; }
       .pr-page + .pr-page { break-before: page; page-break-before: always; }
 
-      .pr-cover-header { border-bottom: 3px solid #4facfe; padding-bottom: 12px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: flex-end; }
-      .pr-cover-header h1 { font-size: 1.6em; color: #1a1a2e; margin: 0; }
-      .pr-cover-header .pr-meta { font-size: 0.85em; color: #666; text-align: right; line-height: 1.8; }
+      /* Cover band — extends to full page width by counteracting .pr-page padding */
+      .pr-cover-band { background: #04141E; color: #fff; padding: 28px 36px 20px; margin: -24px -36px 24px; border-bottom: 4px solid #32BEFC; display: flex; flex-direction: column; gap: 8px; }
+      .pr-cover-band svg { height: 36px; width: auto; }
+      .pr-cover-band h1 { font-size: 1.7em; font-weight: 700; color: #fff; margin: 0 0 4px; }
+      .pr-band-sub { font-size: 0.78em; color: #32BEFC; letter-spacing: 0.09em; text-transform: uppercase; }
 
-      .pr-section-title { font-size: 1em; font-weight: 700; color: #4facfe; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+      /* Metadata row */
+      .pr-meta-row { display: flex; border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; margin-bottom: 20px; }
+      .pr-meta-cell { flex: 1; padding: 10px 16px; border-right: 1px solid #e0e0e0; }
+      .pr-meta-cell:last-child { border-right: none; }
+      .pr-meta-label { font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.07em; color: #999; margin-bottom: 3px; }
+      .pr-meta-value { font-size: 1em; font-weight: 700; color: #04141E; }
 
-      .pr-chart-wrap { width: 300px; margin: 0 auto 16px; }
+      .pr-section-title { font-size: 1em; font-weight: 700; color: #32BEFC; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+
+      .pr-chart-wrap { width: 400px; margin: 0 auto 16px; }
       .pr-chart-wrap img { width: 100%; height: auto; }
 
+      /* Tables */
       .pr-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 0.92em; }
-      .pr-table th { background: #1a1a2e; color: #fff; padding: 7px 12px; text-align: left; }
-      .pr-table td { padding: 7px 12px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; }
+      .pr-table th { background: #04141E; color: #fff; padding: 8px 12px; text-align: left; }
+      .pr-table td { padding: 8px 12px; border-bottom: 1px solid #e0e0e0; vertical-align: middle; }
       .pr-table tr:nth-child(even) td { background: #f7f9fc; }
+
+      /* Badges */
       .pr-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.82em; font-weight: 600; }
       .pr-l1 { background: #fde8e8; color: #c0392b; }
       .pr-l2 { background: #fef3e2; color: #e67e22; }
       .pr-l3 { background: #fefce8; color: #b7950b; }
       .pr-l4 { background: #eafaf1; color: #1e8449; }
-      .pr-l5 { background: #eaf4fe; color: #1a6fb5; }
+      .pr-l5 { background: #eaf4fe; color: #0E6093; }
 
-      .pr-theme-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4facfe; padding-bottom: 10px; margin-bottom: 20px; }
-      .pr-theme-header h2 { font-size: 1.4em; color: #1a1a2e; margin: 0; }
-      .pr-theme-score { font-size: 1.1em; font-weight: 700; color: #4facfe; }
+      /* Executive summary */
+      .pr-summary-box { text-align: center; padding: 20px; background: #f7f9fc; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; }
+      .pr-overall-num { font-size: 2.8em; font-weight: 700; color: #04141E; margin-right: 10px; }
+      .pr-summary-label { color: #666; font-size: 0.9em; margin-top: 8px; }
+      .pr-highlights { display: flex; gap: 16px; margin-bottom: 20px; }
+      .pr-highlight { flex: 1; padding: 14px 16px; border-radius: 6px; }
+      .pr-highlight-high { background: #eafaf1; border-left: 4px solid #1e8449; }
+      .pr-highlight-low  { background: #fef3e2; border-left: 4px solid #e67e22; }
+      .pr-highlight-lbl  { font-size: 0.75em; text-transform: uppercase; color: #888; letter-spacing: 0.05em; margin-bottom: 5px; }
+      .pr-highlight-val  { font-size: 1em; font-weight: 700; color: #04141E; }
 
-      .pr-questions { margin-bottom: 20px; }
-      .pr-q-row { display: flex; gap: 12px; align-items: center; padding: 7px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.88em; }
-      .pr-q-label { font-weight: 700; color: #4facfe; min-width: 28px; }
-      .pr-q-text { flex: 1; color: #333; }
-      .pr-q-score { font-weight: 700; color: #1a1a2e; min-width: 36px; text-align: right; }
+      /* Theme pages */
+      .pr-theme-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #32BEFC; padding-bottom: 10px; margin-bottom: 20px; }
+      .pr-theme-header h2 { font-size: 1.4em; color: #04141E; margin: 0; }
+      .pr-theme-score { font-size: 1.1em; font-weight: 700; color: #32BEFC; }
 
+      /* Question table cells */
+      .pr-q-label { font-weight: 700; color: #32BEFC; width: 36px; }
+      .pr-q-text  { color: #333; }
+      .pr-q-score { font-weight: 700; color: #04141E; text-align: right; width: 50px; }
+
+      /* Comments */
       .pr-comments-title { font-size: 0.95em; font-weight: 700; color: #333; margin-bottom: 8px; }
-      .pr-comment { border-left: 3px solid #4facfe; padding: 8px 12px; margin-bottom: 8px; font-size: 0.85em; color: #444; background: #f7f9fc; }
+      .pr-comment { border-left: 3px solid #32BEFC; padding: 8px 12px; margin-bottom: 8px; font-size: 0.85em; color: #444; background: #f7f9fc; }
       .pr-no-comments { font-size: 0.85em; color: #999; font-style: italic; }
 
+      /* Maturity legend page */
+      .pr-legend-intro { color: #555; font-size: 0.9em; line-height: 1.6; margin-bottom: 24px; }
+      .pr-legend-table td { vertical-align: top; padding: 12px 14px; }
+      .pr-legend-desc { color: #444; font-size: 0.9em; line-height: 1.5; }
+
+      /* Footer — 3-column: left title | center date | right page */
       .pr-footer { margin-top: 20px; padding-top: 12px; border-top: 1px solid #e0e0e0; font-size: 0.78em; color: #aaa; display: flex; justify-content: space-between; }
     }
   </style>
@@ -162,6 +195,23 @@
 <body>
 <div class="container">
   <div class="header">
+    <div class="header-logo">
+      <svg width="260" height="36" viewBox="0 0 520 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M477.986 57.1817V15.1362H491.706V22.4521H492.127C495.326 17.2384 499.787 13.7066 506.437 13.7066C513.928 13.7066 519.147 18.0793 519.147 29.2635V57.1817H505.09V34.393C505.09 29.3475 503.407 26.068 499.198 26.068C495.663 26.068 491.959 28.3385 491.959 35.8226V57.1817H477.986Z" fill="#FFFFFF"/>
+        <path d="M458.83 14.9682C460.935 15.3887 463.292 15.8091 465.817 15.8091C468.089 15.8091 470.446 15.3887 472.803 14.9682V57.1819H458.83V14.9682ZM458.746 6.55911C458.746 3.27956 460.261 1.0932 465.901 1.0932C471.456 1.0932 473.14 3.11139 473.14 6.55911C473.14 10.4273 470.951 12.025 465.901 12.025C461.019 12.025 458.746 10.5955 458.746 6.55911Z" fill="#FFFFFF"/>
+        <path d="M412.795 57.1819V0H426.767V22.4523H427.188C430.387 17.2387 434.764 13.7068 441.414 13.7068C448.737 13.7068 453.955 18.0796 453.955 29.2637V57.1819H439.898V34.3932C439.898 29.3478 438.215 26.0682 434.006 26.0682C430.471 26.0682 426.767 28.3387 426.767 35.8228V57.1819H412.795Z" fill="#FFFFFF"/>
+        <path d="M365.362 71.4771V15.1362H378.914V21.6112H379.335C382.449 16.9862 387.415 13.7066 393.981 13.7066C403.24 13.7066 409.637 20.0134 409.637 34.4771C409.637 48.3521 404.587 58.5271 392.382 58.5271C387.415 58.5271 382.449 56.593 379.335 51.4635H378.914V71.4771H365.362ZM379.419 36.243C379.419 43.643 381.944 48.4362 387.584 48.4362C392.803 48.4362 396.001 44.3157 396.001 36.0748C396.001 28.5907 393.308 23.8816 387.836 23.8816C383.038 23.8816 379.419 27.4975 379.419 36.243Z" fill="#FFFFFF"/>
+        <path d="M360.179 57.1819H346.206V1.00529e-05H360.179V57.1819Z" fill="#FFFFFF"/>
+        <path d="M321.186 58.5271C307.971 58.5271 299.217 52.0521 299.217 36.1589C299.217 22.9566 305.362 13.7066 321.186 13.7066C334.317 13.7066 343.071 20.2657 343.071 36.1589C343.071 49.3612 336.927 58.5271 321.186 58.5271ZM312.853 36.1589C312.853 43.3066 315.126 48.4362 321.186 48.4362C326.152 48.4362 329.435 44.7362 329.435 36.1589C329.435 29.0112 327.163 23.8816 321.186 23.8816C316.136 23.8816 312.853 27.5816 312.853 36.1589Z" fill="#FFFFFF"/>
+        <path d="M247.833 57.1819V1.68183H271.823C286.89 1.68183 297.496 9.4182 297.496 29.4319C297.496 46.0819 289.752 57.1819 270.476 57.1819H247.833ZM262.311 44.1478H269.55C277.042 44.1478 282.597 40.0273 282.597 29.516C282.597 20.6864 278.725 14.7159 270.224 14.7159H262.311V44.1478Z" fill="#FFFFFF"/>
+        <path d="M225.372 58.5271C211.315 58.5271 201.803 52.2203 201.803 35.8225C201.803 22.7044 207.864 13.7066 223.015 13.7066C235.304 13.7066 243.301 19.8453 243.301 34.4771V39.8589H215.692C215.692 45.1567 219.227 48.6044 227.644 48.6044C232.358 48.6044 236.988 47.6794 242.122 45.1567V55.0794C238.166 57.1817 232.611 58.5271 225.372 58.5271ZM215.692 31.5339H231.348C231.348 26.6566 229.159 23.2089 223.604 23.2089C218.974 23.2089 215.692 25.6475 215.692 31.5339Z" fill="#FFFFFF"/>
+        <path d="M170.745 58.5272C161.402 58.5272 157.782 51.884 157.782 43.3908V15.1362H171.755V39.859C171.755 43.3908 172.681 48.0999 177.395 48.0999C181.435 48.0999 184.044 44.8203 184.633 40.1112V15.1362H198.69V57.1817H185.054V50.2022H184.633C182.277 55.0794 177.815 58.5272 170.745 58.5272Z" fill="#FFFFFF"/>
+        <path d="M152.936 57.1819H138.963V1.00529e-05H152.936V57.1819Z" fill="#FFFFFF"/>
+        <path d="M88.3518 57.1819V1.68183H115.035C125.893 1.68183 133.132 5.7182 133.132 16.0614C133.132 21.9478 130.691 26.5728 124.21 28.8432V29.2637C131.028 30.1887 135.573 33.9728 135.573 42.1296C135.573 51.2114 130.102 57.1819 116.129 57.1819H88.3518ZM102.83 47.4273H112.004C117.56 47.4273 121.263 45.5773 121.263 40.8682C121.263 35.9069 117.223 34.4773 113.015 34.4773H102.83V47.4273ZM102.83 25.6478H110.826C116.213 25.6478 119.833 23.7978 119.833 19.0046C119.833 15.2205 117.728 12.6137 112.257 12.6137H102.83V25.6478Z" fill="#FFFFFF"/>
+        <path d="M53.6441 40.3102C55.0953 40.3102 56.2716 41.4854 56.2716 42.9352V54.9788C56.2716 56.4286 55.0953 57.6051 53.6441 57.6052H4.547C3.09575 57.6052 1.91944 56.4286 1.91944 54.9788V42.9352C1.91944 41.4854 3.09575 40.3102 4.547 40.3102H53.6441Z" fill="#32BEFC"/>
+        <path d="M53.6564 1.84167C55.1006 1.84191 56.2714 3.01152 56.2716 4.45437V29.936C56.2716 32.2186 53.5477 33.4043 51.8746 31.8501L35.4154 16.5526C34.9567 16.1239 34.3399 15.8623 33.6623 15.8622C32.2461 15.8622 31.0973 17.0073 31.0949 18.4216L31.0908 18.4243L31.0881 18.427C30.5039 26.4252 23.8294 32.7345 15.6744 32.7346C7.13554 32.7346 0.213056 25.8187 0.212891 17.2882C0.212891 8.75747 7.13543 1.84167 15.6744 1.84167C15.9369 1.84168 16.1284 1.84167 16.4699 1.84167C16.8291 1.84167 17.2129 1.84167 17.5904 1.84167H53.6564Z" fill="#32BEFC"/>
+      </svg>
+    </div>
     <h1>Architecture Maturity Assessment</h1>
     <p class="meta"></p>
   </div>
@@ -181,7 +231,7 @@
         <h2>Overall Maturity Profile</h2>
         <div class="chart-container"><canvas id="mainChart"></canvas></div>
         <div class="legend">
-          <div class="legend-item"><div class="legend-color" style="background:#4facfe"></div>Survey Results</div>
+          <div class="legend-item"><div class="legend-color" style="background:#32BEFC"></div>Survey Results</div>
         </div>
       </div>
       <div class="card">
@@ -199,8 +249,8 @@
         <h2>Results vs Actual</h2>
         <div class="chart-container"><canvas id="comparisonChart"></canvas></div>
         <div class="legend">
-          <div class="legend-item"><div class="legend-color" style="background:#4facfe"></div>Survey Results</div>
-          <div class="legend-item"><div class="legend-color" style="background:#00f2fe"></div>Actual</div>
+          <div class="legend-item"><div class="legend-color" style="background:#32BEFC"></div>Survey Results</div>
+          <div class="legend-item"><div class="legend-color" style="background:#82F0F0"></div>Actual</div>
         </div>
       </div>
     </div>
@@ -325,8 +375,13 @@
   function handleFile(file) {
     let companyName = '';
     const bracketMatch = file.name.match(/\[([^\]]+)\]/);
+    /* Dutch exports name the customer after the language tag:
+       "Architectuur Volwassenheidsmeting (NL) Waterschap Drentse Overijsselse Delta.xlsx" */
+    const langMatch = file.name.match(/\((?:NL|EN)\)\s*(.+?)\s*\.(?:xlsx?|csv)$/i);
     if (bracketMatch) {
       companyName = bracketMatch[1].trim();
+    } else if (langMatch) {
+      companyName = langMatch[1].trim();
     } else {
       const altMatch = file.name.match(/Assessment\s+([A-Za-z0-9\s]+?)\s+\(/i);
       if (altMatch) companyName = altMatch[1].trim();
@@ -343,9 +398,29 @@
     reader.readAsArrayBuffer(file);
   }
 
+  /* Matches the theme number in a Forms column header, in any language:
+     "Theme 1. Strategy and Alignment: ..." and "Thema 1. Strategie en afstemming: ..." */
+  const THEME_NUM = /\bthem[ae]\s*\.?\s*([1-7])\b/i;
+
+  /* Standard Microsoft Forms metadata columns, English and Dutch tenants. */
+  const META_COL = /^(id|start time|completion time|email|name|last modified time|language|begintijd|tijd van voltooien|e-?mail|naam|taal|tijd van laatste wijziging)$/i;
+
+  const isRemarkCol = c => /remark|comment|opmerking|toelichting/i.test(c);
+
+  /* Forms answers start with their score ("3. Architecture is ..."). Fall back to a
+     lone digit elsewhere in the cell, but never guess when several could apply. */
+  function parseScore(v) {
+    const s = String(v == null ? '' : v).trim();
+    if (!s) return null;
+    const lead = s.match(/^\s*([1-5])\b/);
+    if (lead) return parseInt(lead[1]);
+    const all = s.match(/\b[1-5]\b/g);
+    return all && all.length === 1 ? parseInt(all[0]) : null;
+  }
+
   function processData(rows, companyName) {
     const cols = Object.keys(rows[0]);
-    const isMSForms = cols.some(c => c.includes('Theme') && c.includes('statement aligns best'));
+    const isMSForms = cols.some(c => THEME_NUM.test(c));
     isMSForms ? processFormsData(rows, cols, companyName) : processSimpleData(rows, companyName);
   }
 
@@ -359,34 +434,50 @@
   }
 
   function processFormsData(rows, cols, companyName) {
-    const themePatterns = [
-      { name: "Strategy & Alignment",    pattern: /Theme\s*1/i, remarkPattern: /remarks.*Strategy/i },
-      { name: "Processes & Methods",     pattern: /Theme\s*2/i, remarkPattern: /remarks.*Processes/i },
-      { name: "Governance & Compliance", pattern: /Theme\s*3/i, remarkPattern: /remarks.*Governance/i },
-      { name: "People & Skills",         pattern: /Theme\s*4/i, remarkPattern: /remarks.*People/i },
-      { name: "Tools & Assets",          pattern: /Theme\s*5/i, remarkPattern: /remarks.*Tools/i },
-      { name: "Value & Measurement",     pattern: /Theme\s*6/i, remarkPattern: /remarks.*Value/i },
-      { name: "Solution Architecture",   pattern: /Theme\s*7/i, remarkPattern: /remarks.*Solution/i }
-    ];
+    /* Theme number per column, in sheet order. 0 = not a themed question column. */
+    const themeOf = cols.map(c => { const m = c.match(THEME_NUM); return m ? parseInt(m[1]) : 0; });
+    const themeNamesInOrder = Object.keys(THEMES);
     const themeScores = {}, qualData = {};
-    for (const t of themePatterns) {
-      const themeCols = cols.filter(c => t.pattern.test(c) && !c.toLowerCase().includes('remarks'));
-      const remarkCol = cols.find(c => t.remarkPattern.test(c));
-      questionScores[t.name] = [];
-      qualData[t.name] = [];
+
+    for (let n = 1; n <= themeNamesInOrder.length; n++) {
+      const name = themeNamesInOrder[n - 1];
+      const themeCols = cols.filter((c, i) => themeOf[i] === n && !isRemarkCol(c));
+
+      /* The remark column carries no theme number in any language, so find it by
+         position: the first unnumbered, non-metadata column after this theme's
+         questions and before the next theme starts. */
+      let lastIdx = -1;
+      cols.forEach((c, i) => { if (themeOf[i] === n) lastIdx = i; });
+      let remarkCol = null;
+      for (let i = lastIdx + 1; i < cols.length && !themeOf[i]; i++) {
+        if (META_COL.test(cols[i].trim())) continue;
+        remarkCol = cols[i];
+        break;
+      }
+
+      questionScores[name] = [];
+      qualData[name] = [];
       const allScores = [];
       for (let qi = 0; qi < themeCols.length; qi++) {
-        const qScores = rows.map(r => { const m = String(r[themeCols[qi]] || '').match(/^(\d)/); return m ? parseInt(m[1]) : null; }).filter(Boolean);
-        questionScores[t.name][qi] = avg(qScores);
+        const qScores = rows.map(r => parseScore(r[themeCols[qi]])).filter(n => n !== null);
+        questionScores[name][qi] = avg(qScores);
         allScores.push(...qScores);
       }
-      themeScores[t.name] = avg(allScores);
+      themeScores[name] = avg(allScores);
       if (remarkCol) {
         for (const r of rows) {
           const txt = String(r[remarkCol] || '').trim();
-          if (txt.length > 2 && !/^[xyn\/a-]$/i.test(txt)) qualData[t.name].push(txt);
+          if (txt.length > 2 && !/^[xyn\/a-]$/i.test(txt)) qualData[name].push(txt);
         }
       }
+    }
+
+    /* Report an unreadable file instead of rendering an empty assessment. */
+    if (!Object.values(themeScores).some(s => s > 0)) {
+      alert('The themes were recognised, but no scores could be read from the answers.\n\n' +
+            'Answers are expected to start with their score, for example "3. Architecture is ...".\n\n' +
+            'Please share this export so the tool can be adjusted.');
+      return;
     }
     renderResults(themeScores, qualData, rows.length, companyName);
   }
@@ -405,6 +496,13 @@
       themeScores[name] = avg(allScores);
       for (const r of rows) { const txt = String(r[cfg.textField] || '').trim(); if (txt) qualData[name].push(txt); }
     }
+    if (!Object.values(themeScores).some(s => s > 0)) {
+      alert('No maturity scores could be read from this file.\n\n' +
+            'The tool expects either a Microsoft Forms export with "Theme 1 ... Theme 7" columns ' +
+            '(English or Dutch), or a sheet with columns named Q1 to Q41.\n\n' +
+            'Please share this export so the tool can be adjusted.');
+      return;
+    }
     renderResults(themeScores, qualData, rows.length, companyName);
   }
 
@@ -415,8 +513,7 @@
     storedQualData = qualData;
     storedMeta = { companyName, responseCount, date: new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) };
 
-    document.querySelector('.header h1').textContent =
-      companyName ? `${companyName} Architecture Maturity Assessment` : 'Architecture Maturity Assessment';
+    document.querySelector('.header h1').textContent = 'Architecture Maturity Assessment';
     document.querySelector('.meta').innerHTML =
       `${companyName ? `<div class="company-name">${companyName}</div>` : ''}
        <span>Generated: ${storedMeta.date}</span>
@@ -488,11 +585,11 @@
     if (mainChart) mainChart.destroy();
     if (comparisonChart) comparisonChart.destroy();
     mainChart = new Chart(document.getElementById('mainChart'), radarConfig(themeNames, [
-      { data: currentScores, backgroundColor: 'rgba(79,172,254,0.2)', borderColor: '#4facfe', borderWidth: 2, pointBackgroundColor: '#4facfe' }
+      { data: currentScores, backgroundColor: 'rgba(50,190,252,0.2)', borderColor: '#32BEFC', borderWidth: 2, pointBackgroundColor: '#32BEFC' }
     ]));
     comparisonChart = new Chart(document.getElementById('comparisonChart'), radarConfig(themeNames, [
-      { data: currentScores,      backgroundColor: 'rgba(79,172,254,0.2)', borderColor: '#4facfe', borderWidth: 2, pointBackgroundColor: '#4facfe' },
-      { data: [...refinedScores], backgroundColor: 'rgba(0,242,254,0.2)',  borderColor: '#00f2fe', borderWidth: 2, pointBackgroundColor: '#00f2fe' }
+      { data: currentScores,      backgroundColor: 'rgba(50,190,252,0.2)', borderColor: '#32BEFC', borderWidth: 2, pointBackgroundColor: '#32BEFC' },
+      { data: [...refinedScores], backgroundColor: 'rgba(130,240,240,0.2)',  borderColor: '#82F0F0', borderWidth: 2, pointBackgroundColor: '#82F0F0' }
     ]));
   }
 
@@ -515,7 +612,7 @@
     const qTexts = QUESTION_LABELS[themeNames[i]] || null;
     themeCharts[i] = new Chart(document.getElementById('themeChart' + i), radarConfig(
       scores.map((_, qi) => `Q${qi + 1}`),
-      [{ data: scores, backgroundColor: 'rgba(79,172,254,0.2)', borderColor: '#4facfe', borderWidth: 2, pointBackgroundColor: '#4facfe' }],
+      [{ data: scores, backgroundColor: 'rgba(50,190,252,0.2)', borderColor: '#32BEFC', borderWidth: 2, pointBackgroundColor: '#32BEFC' }],
       qTexts
     ));
   }
@@ -527,46 +624,111 @@
     btn.disabled = true;
 
     try {
-    const mainImg   = await chartToImage(comparisonChart);
+    const mainImg   = await mainChartToImage();
     const themeImgs = await buildAllThemeImages();
 
     const { companyName, responseCount, date } = storedMeta;
-    const title = companyName ? `${companyName} Architecture Maturity Assessment` : 'Architecture Maturity Assessment';
+    const title = 'BlueDolphin Architecture Maturity Assessment';
+    const totalPages = 3 + themeNames.length;
 
-    // Cover page
+    const footer = (pageNum, subTitle) =>
+      `<div class="pr-footer">
+        <span>${subTitle || title}</span>
+        <span>${date}</span>
+        <span>Page ${pageNum} of ${totalPages}</span>
+      </div>`;
+
+    const logoSvg = `<svg width="200" height="28" viewBox="0 0 520 72" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M477.986 57.1817V15.1362H491.706V22.4521H492.127C495.326 17.2384 499.787 13.7066 506.437 13.7066C513.928 13.7066 519.147 18.0793 519.147 29.2635V57.1817H505.09V34.393C505.09 29.3475 503.407 26.068 499.198 26.068C495.663 26.068 491.959 28.3385 491.959 35.8226V57.1817H477.986Z" fill="#FFFFFF"/><path d="M458.83 14.9682C460.935 15.3887 463.292 15.8091 465.817 15.8091C468.089 15.8091 470.446 15.3887 472.803 14.9682V57.1819H458.83V14.9682ZM458.746 6.55911C458.746 3.27956 460.261 1.0932 465.901 1.0932C471.456 1.0932 473.14 3.11139 473.14 6.55911C473.14 10.4273 470.951 12.025 465.901 12.025C461.019 12.025 458.746 10.5955 458.746 6.55911Z" fill="#FFFFFF"/><path d="M412.795 57.1819V0H426.767V22.4523H427.188C430.387 17.2387 434.764 13.7068 441.414 13.7068C448.737 13.7068 453.955 18.0796 453.955 29.2637V57.1819H439.898V34.3932C439.898 29.3478 438.215 26.0682 434.006 26.0682C430.471 26.0682 426.767 28.3387 426.767 35.8228V57.1819H412.795Z" fill="#FFFFFF"/><path d="M365.362 71.4771V15.1362H378.914V21.6112H379.335C382.449 16.9862 387.415 13.7066 393.981 13.7066C403.24 13.7066 409.637 20.0134 409.637 34.4771C409.637 48.3521 404.587 58.5271 392.382 58.5271C387.415 58.5271 382.449 56.593 379.335 51.4635H378.914V71.4771H365.362ZM379.419 36.243C379.419 43.643 381.944 48.4362 387.584 48.4362C392.803 48.4362 396.001 44.3157 396.001 36.0748C396.001 28.5907 393.308 23.8816 387.836 23.8816C383.038 23.8816 379.419 27.4975 379.419 36.243Z" fill="#FFFFFF"/><path d="M360.179 57.1819H346.206V1.00529e-05H360.179V57.1819Z" fill="#FFFFFF"/><path d="M321.186 58.5271C307.971 58.5271 299.217 52.0521 299.217 36.1589C299.217 22.9566 305.362 13.7066 321.186 13.7066C334.317 13.7066 343.071 20.2657 343.071 36.1589C343.071 49.3612 336.927 58.5271 321.186 58.5271ZM312.853 36.1589C312.853 43.3066 315.126 48.4362 321.186 48.4362C326.152 48.4362 329.435 44.7362 329.435 36.1589C329.435 29.0112 327.163 23.8816 321.186 23.8816C316.136 23.8816 312.853 27.5816 312.853 36.1589Z" fill="#FFFFFF"/><path d="M247.833 57.1819V1.68183H271.823C286.89 1.68183 297.496 9.4182 297.496 29.4319C297.496 46.0819 289.752 57.1819 270.476 57.1819H247.833ZM262.311 44.1478H269.55C277.042 44.1478 282.597 40.0273 282.597 29.516C282.597 20.6864 278.725 14.7159 270.224 14.7159H262.311V44.1478Z" fill="#FFFFFF"/><path d="M225.372 58.5271C211.315 58.5271 201.803 52.2203 201.803 35.8225C201.803 22.7044 207.864 13.7066 223.015 13.7066C235.304 13.7066 243.301 19.8453 243.301 34.4771V39.8589H215.692C215.692 45.1567 219.227 48.6044 227.644 48.6044C232.358 48.6044 236.988 47.6794 242.122 45.1567V55.0794C238.166 57.1817 232.611 58.5271 225.372 58.5271ZM215.692 31.5339H231.348C231.348 26.6566 229.159 23.2089 223.604 23.2089C218.974 23.2089 215.692 25.6475 215.692 31.5339Z" fill="#FFFFFF"/><path d="M170.745 58.5272C161.402 58.5272 157.782 51.884 157.782 43.3908V15.1362H171.755V39.859C171.755 43.3908 172.681 48.0999 177.395 48.0999C181.435 48.0999 184.044 44.8203 184.633 40.1112V15.1362H198.69V57.1817H185.054V50.2022H184.633C182.277 55.0794 177.815 58.5272 170.745 58.5272Z" fill="#FFFFFF"/><path d="M152.936 57.1819H138.963V1.00529e-05H152.936V57.1819Z" fill="#FFFFFF"/><path d="M88.3518 57.1819V1.68183H115.035C125.893 1.68183 133.132 5.7182 133.132 16.0614C133.132 21.9478 130.691 26.5728 124.21 28.8432V29.2637C131.028 30.1887 135.573 33.9728 135.573 42.1296C135.573 51.2114 130.102 57.1819 116.129 57.1819H88.3518ZM102.83 47.4273H112.004C117.56 47.4273 121.263 45.5773 121.263 40.8682C121.263 35.9069 117.223 34.4773 113.015 34.4773H102.83V47.4273ZM102.83 25.6478H110.826C116.213 25.6478 119.833 23.7978 119.833 19.0046C119.833 15.2205 117.728 12.6137 112.257 12.6137H102.83V25.6478Z" fill="#FFFFFF"/><path d="M53.6441 40.3102C55.0953 40.3102 56.2716 41.4854 56.2716 42.9352V54.9788C56.2716 56.4286 55.0953 57.6051 53.6441 57.6052H4.547C3.09575 57.6052 1.91944 56.4286 1.91944 54.9788V42.9352C1.91944 41.4854 3.09575 40.3102 4.547 40.3102H53.6441Z" fill="#32BEFC"/><path d="M53.6564 1.84167C55.1006 1.84191 56.2714 3.01152 56.2716 4.45437V29.936C56.2716 32.2186 53.5477 33.4043 51.8746 31.8501L35.4154 16.5526C34.9567 16.1239 34.3399 15.8623 33.6623 15.8622C32.2461 15.8622 31.0973 17.0073 31.0949 18.4216L31.0908 18.4243L31.0881 18.427C30.5039 26.4252 23.8294 32.7345 15.6744 32.7346C7.13554 32.7346 0.213056 25.8187 0.212891 17.2882C0.212891 8.75747 7.13543 1.84167 15.6744 1.84167C15.9369 1.84168 16.1284 1.84167 16.4699 1.84167C16.8291 1.84167 17.2129 1.84167 17.5904 1.84167H53.6564Z" fill="#32BEFC"/></svg>`;
+
+    const band = (heading, sub) =>
+      `<div class="pr-cover-band">
+        ${logoSvg}
+        <h1>${heading}</h1>
+        ${sub ? `<div class="pr-band-sub">${sub}</div>` : ''}
+      </div>`;
+
+    const overallScore = Math.round(currentScores.reduce((a, b) => a + b, 0) / currentScores.length * 10) / 10;
+    const { name: overallLevel, prCls: overallCls } = getLevel(overallScore);
+    const maxIdx = currentScores.indexOf(Math.max(...currentScores));
+    const minIdx = currentScores.indexOf(Math.min(...currentScores));
+
+    const themeTableRows = themeNames.map((name, i) => {
+      const { name: lvlName, prCls } = getLevel(currentScores[i]);
+      return `<tr>
+        <td>${name}</td>
+        <td><strong>${currentScores[i].toFixed(1)} / 5.0</strong></td>
+        <td><span class="pr-badge ${prCls}">${lvlName}</span></td>
+      </tr>`;
+    }).join('');
+
+    // Page 1: Cover
     let html = `<div class="pr-page">
-      <div class="pr-cover-header">
-        <h1>${title}</h1>
-        <div class="pr-meta">
-          ${companyName ? `<div>${companyName}</div>` : ''}
-          <div>Generated: ${date}</div>
-          <div>Respondents: ${responseCount}</div>
-        </div>
+      ${band(title)}
+      <div class="pr-meta-row">
+        ${companyName ? `<div class="pr-meta-cell"><div class="pr-meta-label">Organisation</div><div class="pr-meta-value">${companyName}</div></div>` : ''}
+        <div class="pr-meta-cell"><div class="pr-meta-label">Generated</div><div class="pr-meta-value">${date}</div></div>
+        <div class="pr-meta-cell"><div class="pr-meta-label">Respondents</div><div class="pr-meta-value">${responseCount}</div></div>
       </div>
       <div class="pr-section-title">Overall Maturity Profile</div>
       <div class="pr-chart-wrap"><img src="${mainImg}"></div>
-      <div style="display:flex;gap:20px;justify-content:center;margin-bottom:18px;font-size:0.85em;">
-        <span style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#1a6fb5;"></span>Survey Results</span>
-        <span style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#0a9db5;"></span>Actual</span>
-      </div>
       <div class="pr-section-title">Theme Scores</div>
       <table class="pr-table">
         <thead><tr><th>Theme</th><th>Score</th><th>Maturity Level</th></tr></thead>
-        <tbody>
-          ${themeNames.map((name, i) => {
-            const { name: lvlName, prCls } = getLevel(currentScores[i]);
-            return `<tr>
-              <td>${name}</td>
-              <td><strong>${currentScores[i].toFixed(1)} / 5.0</strong></td>
-              <td><span class="pr-badge ${prCls}">${lvlName}</span></td>
-            </tr>`;
-          }).join('')}
-        </tbody>
+        <tbody>${themeTableRows}</tbody>
       </table>
-      <div class="pr-footer"><span>${title}</span><span>${date}</span></div>
+      ${footer(1)}
     </div>`;
 
-    // One page per theme
+    // Page 2: Executive Summary
+    html += `<div class="pr-page">
+      ${band('Executive Summary', 'Architecture Maturity Assessment')}
+      <div class="pr-summary-box">
+        <div><span class="pr-overall-num">${overallScore.toFixed(1)}</span><span class="pr-badge ${overallCls}">${overallLevel}</span></div>
+        <div class="pr-summary-label">Overall Architecture Maturity Score</div>
+      </div>
+      <div class="pr-highlights">
+        <div class="pr-highlight pr-highlight-high">
+          <div class="pr-highlight-lbl">Highest Performing Theme</div>
+          <div class="pr-highlight-val">${themeNames[maxIdx]} &mdash; ${currentScores[maxIdx].toFixed(1)}</div>
+        </div>
+        <div class="pr-highlight pr-highlight-low">
+          <div class="pr-highlight-lbl">Area for Improvement</div>
+          <div class="pr-highlight-val">${themeNames[minIdx]} &mdash; ${currentScores[minIdx].toFixed(1)}</div>
+        </div>
+      </div>
+      <div class="pr-section-title">All Theme Scores</div>
+      <table class="pr-table">
+        <thead><tr><th>Theme</th><th>Score</th><th>Maturity Level</th></tr></thead>
+        <tbody>${themeTableRows}</tbody>
+      </table>
+      ${footer(2)}
+    </div>`;
+
+    // Page 3: Maturity Legend
+    const LEGEND_DATA = [
+      { cls: 'pr-l1', name: 'Initial',    range: '1.0 &ndash; 1.4', desc: 'Ad hoc, no formal processes in place. Architecture is reactive and unpredictable.' },
+      { cls: 'pr-l2', name: 'Developing', range: '1.5 &ndash; 2.4', desc: 'Emerging practices are in place but inconsistently applied across the organisation.' },
+      { cls: 'pr-l3', name: 'Defined',    range: '2.5 &ndash; 3.4', desc: 'Architecture processes are documented, standardised, and applied organisation-wide.' },
+      { cls: 'pr-l4', name: 'Managed',    range: '3.5 &ndash; 4.4', desc: 'Architecture is measured, monitored, and actively managed with clear KPIs and targets.' },
+      { cls: 'pr-l5', name: 'Optimized',  range: '4.5 &ndash; 5.0', desc: 'Continuously improving architecture capability; industry-leading and proactively innovating.' },
+    ];
+    html += `<div class="pr-page">
+      ${band('Maturity Levels', 'Architecture Maturity Assessment Framework')}
+      <p class="pr-legend-intro">The Architecture Maturity Assessment uses a five-level scale to evaluate organisational capability across seven themes. Each level represents a distinct stage of maturity, from ad hoc practices to continuously optimised capabilities.</p>
+      <table class="pr-table pr-legend-table">
+        <thead><tr><th>Level</th><th>Score Range</th><th>Description</th></tr></thead>
+        <tbody>
+          ${LEGEND_DATA.map(l => `<tr>
+            <td><span class="pr-badge ${l.cls}">${l.name}</span></td>
+            <td style="white-space:nowrap;color:#555;">${l.range}</td>
+            <td class="pr-legend-desc">${l.desc}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      ${footer(3)}
+    </div>`;
+
+    // Pages 4\u201310: One page per theme
     themeNames.forEach((name, i) => {
       const { name: lvlName, prCls } = getLevel(currentScores[i]);
       const qLabels  = QUESTION_LABELS[name] || [];
@@ -574,11 +736,11 @@
       const comments = storedQualData[name]  || [];
 
       const qRows = qLabels.map((q, qi) =>
-        `<div class="pr-q-row">
-          <span class="pr-q-label">Q${qi+1}</span>
-          <span class="pr-q-text">${q}</span>
-          <span class="pr-q-score">${(qScores[qi] || 0).toFixed(1)}</span>
-        </div>`
+        `<tr>
+          <td class="pr-q-label">Q${qi+1}</td>
+          <td class="pr-q-text">${q}</td>
+          <td class="pr-q-score">${(qScores[qi] || 0).toFixed(1)}</td>
+        </tr>`
       ).join('');
 
       const commentBlock = comments.length
@@ -595,18 +757,20 @@
         </div>
         <div class="pr-chart-wrap"><img src="${themeImgs[i]}"></div>
         <div class="pr-section-title" style="margin-bottom:10px;">Question Breakdown</div>
-        <div class="pr-questions">${qRows}</div>
-        <div class="pr-comments-title">Comments & Remarks</div>
+        <table class="pr-table">
+          <thead><tr><th style="width:36px;">Q</th><th>Question</th><th style="width:56px;text-align:right;">Score</th></tr></thead>
+          <tbody>${qRows}</tbody>
+        </table>
+        <div class="pr-comments-title" style="margin-top:14px;">Comments &amp; Remarks</div>
         ${commentBlock}
-        <div class="pr-footer"><span>${title} \u2013 ${name}</span><span>${date}</span></div>
+        ${footer(4 + i, `${title} \u2013 ${name}`)}
       </div>`;
     });
 
     document.getElementById('printReport').innerHTML = html;
 
-    // Set filename suggestion (browsers use document.title as the default PDF filename)
     const originalTitle = document.title;
-    document.title = companyName ? `ACMA results (${companyName})` : 'ACMA results';
+    document.title = companyName ? `AMA results (${companyName})` : 'AMA results';
 
     btn.textContent = 'Print / Save PDF';
     btn.disabled = false;
@@ -656,8 +820,8 @@
 
   async function chartToImage(chart) {
     const palette = [
-      { bg: 'rgba(26,111,181,0.15)', border: '#1a6fb5' },
-      { bg: 'rgba(10,157,181,0.2)',  border: '#0a9db5' }
+      { bg: 'rgba(14,96,147,0.15)', border: '#0E6093' },
+      { bg: 'rgba(27,141,137,0.2)',  border: '#1B8D89' }
     ];
     return renderChartToImage({
       type: 'radar',
@@ -676,6 +840,27 @@
     });
   }
 
+  async function mainChartToImage() {
+    return renderChartToImage({
+      type: 'radar',
+      data: {
+        labels: mainChart.data.labels,
+        datasets: [{
+          data: mainChart.data.datasets[0].data,
+          backgroundColor: 'rgba(14,96,147,0.15)',
+          borderColor: '#0E6093',
+          borderWidth: 2,
+          pointBackgroundColor: '#0E6093'
+        }]
+      },
+      options: {
+        animation: false, responsive: false,
+        scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: '#444' }, grid: { color: 'rgba(0,0,0,0.1)' }, pointLabels: { color: '#111', font: { size: 13 } } } },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
   async function buildAllThemeImages() {
     return Promise.all(themeNames.map(name => {
       const scores = questionScores[name] || [];
@@ -684,7 +869,7 @@
         type: 'radar',
         data: {
           labels,
-          datasets: [{ data: scores, backgroundColor: 'rgba(26,111,181,0.15)', borderColor: '#1a6fb5', borderWidth: 2, pointBackgroundColor: '#1a6fb5' }]
+          datasets: [{ data: scores, backgroundColor: 'rgba(14,96,147,0.15)', borderColor: '#0E6093', borderWidth: 2, pointBackgroundColor: '#0E6093' }]
         },
         options: {
           animation: false, responsive: false,
@@ -730,4 +915,3 @@
 </script>
 </body>
 </html>
-
